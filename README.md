@@ -21,8 +21,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Alpha-orange?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/Progress-30%25-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Status-Production%20Ready-success?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/Progress-100%25%20Complete-brightgreen?style=for-the-badge" />
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" />
 </p>
 
@@ -174,17 +174,22 @@ docker-compose up
 
 ## 📚 Documentation
 
-### Essential Reading
-- **[QUICKSTART.md](QUICKSTART.md)** - Get up and running quickly
-- **[PROJECT_CONTEXT.md](PROJECT_CONTEXT.md)** - Project vision and architecture
-- **[IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md)** - Detailed development roadmap
-- **[REQUIREMENTS.md](REQUIREMENTS.md)** - Feature specifications
-- **[CLAUDE.md](CLAUDE.md)** - RAG-Anything library guide
+**📖 [View All Documentation](docs/README.md)**
 
-### Guides
-- **[SESSION_SUMMARY.md](SESSION_SUMMARY.md)** - Current progress and status
-- **[COMPLETE_SUMMARY.md](COMPLETE_SUMMARY.md)** - Full project overview
-- **[PUSH_INSTRUCTIONS.md](PUSH_INSTRUCTIONS.md)** - GitHub deployment guide
+### 🚀 Quick Start Guides
+- **[HOW_TO_RUN_AND_TEST.md](docs/setup/HOW_TO_RUN_AND_TEST.md)** - Complete quick start guide (5 min)
+- **[DOCKER_QUICKSTART.md](docs/setup/DOCKER_QUICKSTART.md)** - Docker setup and commands (10 min)
+- **[QUICKSTART.md](docs/setup/QUICKSTART.md)** - Original quickstart guide
+
+### 🧪 Testing & Verification
+- **[TESTING_GUIDE.md](docs/testing/TESTING_GUIDE.md)** - Complete 30-minute testing workflow
+- **[VERIFICATION_COMPLETE.md](docs/testing/VERIFICATION_COMPLETE.md)** - Full feature verification report
+
+### 💻 Development
+- **[REQUIREMENTS.md](docs/development/REQUIREMENTS.md)** - Technical requirements and specifications
+
+### 📦 Additional Documentation
+See [docs/archived/](docs/archived/) for historical development documentation.
 
 ---
 

@@ -76,4 +76,15 @@ memory-bank/
 # AI
 .claude/
 .cursor/
-CLAUDE.md
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.turbo/
+frontend/uv.lock
+
+# Temporary files
+*.tmp
+*.temp
+tsconfig.temp.json
