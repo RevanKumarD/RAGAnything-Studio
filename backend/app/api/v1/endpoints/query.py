@@ -30,21 +30,35 @@ async def execute_query(request: QueryRequest):
 
     Supports modes: naive, local, global, hybrid
     """
-    # TODO: Integrate with RAG-Anything query functionality
+    from app.services.rag_service import rag_service
 
-    return JSONResponse(
-        status_code=200,
-        content={
-            "query": request.query,
-            "mode": request.mode,
-            "answer": "This is a placeholder response. RAG-Anything integration pending.",
-            "sources": [],
-            "metadata": {
-                "response_time": 0.5,
-                "chunks_retrieved": 0,
-            },
-        },
-    )
+    try:
+        # Execute query using RAG service
+        result = await rag_service.query(
+            query=request.query,
+            mode=request.mode,
+            vlm_enhanced=request.vlm_enhanced,
+            top_k=request.top_k,
+        )
+
+        if result.get("success"):
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "query": request.query,
+                    "mode": request.mode,
+                    "answer": result.get("answer", ""),
+                    "sources": [],  # TODO: Extract sources from result
+                    "metadata": {
+                        "vlm_enhanced": request.vlm_enhanced,
+                    },
+                },
+            )
+        else:
+            raise HTTPException(status_code=500, detail=result.get("error", "Query failed"))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
 
 
 @router.post("/multimodal")
@@ -52,18 +66,32 @@ async def execute_multimodal_query(request: MultimodalQueryRequest):
     """
     Execute a multimodal query with additional context (images, tables, equations).
     """
-    # TODO: Integrate with RAG-Anything multimodal query
+    from app.services.rag_service import rag_service
 
-    return JSONResponse(
-        status_code=200,
-        content={
-            "query": request.query,
-            "mode": request.mode,
-            "answer": "Multimodal query placeholder response.",
-            "multimodal_evidence": request.multimodal_content,
-            "sources": [],
-        },
-    )
+    try:
+        # Execute multimodal query using RAG service
+        result = await rag_service.query_with_multimodal(
+            query=request.query,
+            multimodal_content=request.multimodal_content,
+            mode=request.mode,
+        )
+
+        if result.get("success"):
+            return JSONResponse(
+                status_code=200,
+                content={
+                    "query": request.query,
+                    "mode": request.mode,
+                    "answer": result.get("answer", ""),
+                    "multimodal_content_count": len(request.multimodal_content),
+                    "sources": [],  # TODO: Extract sources
+                },
+            )
+        else:
+            raise HTTPException(status_code=500, detail=result.get("error", "Multimodal query failed"))
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Multimodal query failed: {str(e)}")
 
 
 @router.get("/history")

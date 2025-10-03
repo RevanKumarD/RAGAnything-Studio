@@ -75,22 +75,25 @@ async def parse_document(
     """
     Parse a document using RAG-Anything.
 
-    This endpoint will be enhanced with actual RAG-Anything integration.
-    Currently returns a placeholder response.
+    Integrates with RAGAnything service for actual document parsing.
     """
-    # TODO: Integrate with RAG-Anything library
-    # This is a placeholder implementation
+    from app.services.rag_service import rag_service
 
-    return JSONResponse(
-        status_code=200,
-        content={
-            "message": "Document parsing initiated",
-            "file_path": file_path,
-            "parser": parser or settings.PARSER,
-            "parse_method": parse_method or settings.PARSE_METHOD,
-            "status": "processing",
-        },
-    )
+    try:
+        # Parse document using RAG service
+        result = await rag_service.parse_document(
+            file_path=file_path,
+            parser=parser,
+            parse_method=parse_method,
+        )
+
+        return JSONResponse(
+            status_code=200 if result.get("success") else 500,
+            content=result,
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Parsing failed: {str(e)}")
 
 
 @router.get("/list")
