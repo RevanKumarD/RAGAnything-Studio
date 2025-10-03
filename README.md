@@ -51,6 +51,22 @@
 ---
 
 ## 🎉 News
+
+### 🎨 NEW: RAG-Anything Studio (Web UI)
+**[Check out RAG-Anything Studio →](README_STUDIO.md)**
+
+We've created a premium web interface for RAG-Anything! Built with Next.js 14 + FastAPI, featuring:
+- 📄 Visual document parsing with grounded overlays
+- 💬 AI chat with multimodal queries
+- 🕸️ Interactive 3D knowledge graph
+- 📊 Vector space visualization
+- 🚀 Modern, responsive UI
+
+**Status:** Phase 1 Complete (30% overall) | [View Documentation](QUICKSTART.md)
+
+---
+
+### Library Updates
 - [X] [2025.08.12]🎯📢 🔍 RAG-Anything now features **VLM-Enhanced Query** mode! When documents include images, the system seamlessly integrates them into VLM for advanced multimodal analysis, combining visual and textual context for deeper insights.
 - [X] [2025.07.05]🎯📢 RAG-Anything now features a [context configuration module](docs/context_aware_processing.md), enabling intelligent integration of relevant contextual information to enhance multimodal content processing.
 - [X] [2025.07.04]🎯📢 🚀 RAG-Anything now supports multimodal query capabilities, enabling enhanced RAG with seamless processing of text, images, tables, and equations.
