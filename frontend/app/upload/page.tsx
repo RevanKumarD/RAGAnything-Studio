@@ -90,8 +90,8 @@ export default function UploadPage() {
           );
         });
 
-        if (!uploadResult.success) {
-          throw new Error(uploadResult.error || "Upload failed");
+        if (!uploadResult.data.file_path) {
+          throw new Error(uploadResult.data.message || "Upload failed");
         }
 
         // Update to parsing
@@ -110,12 +110,12 @@ export default function UploadPage() {
 
         // Parse document
         const parseResult = await apiClient.parseDocument(
-          uploadResult.file_path,
+          uploadResult.data.file_path,
           parser,
           parseMethod
         );
 
-        if (parseResult.success) {
+        if (parseResult.data.success) {
           setUploadTasks((prev) =>
             prev.map((task) =>
               task.filename === file.name
@@ -129,7 +129,7 @@ export default function UploadPage() {
             )
           );
         } else {
-          throw new Error(parseResult.error || "Parsing failed");
+          throw new Error(parseResult.data.error || "Parsing failed");
         }
       } catch (error) {
         setUploadTasks((prev) =>

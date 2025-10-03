@@ -183,6 +183,11 @@ class APIClient {
   async healthCheck() {
     return axios.get(`${API_URL}/health`);
   }
+
+  // System Status
+  async getSystemStatus() {
+    return this.client.get('/system/status');
+  }
 }
 
 export const apiClient = new APIClient();

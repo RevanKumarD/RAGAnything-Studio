@@ -78,13 +78,13 @@ export default function ChatPage() {
         result = await apiClient.query(content, settings.mode, settings.vlmEnhanced);
       }
 
-      if (result.success) {
+      if (result.data.success) {
         // Create assistant message
         const assistantMessage: Message = {
           id: (Date.now() + 1).toString(),
           role: "assistant",
-          content: result.answer || "I couldn't generate a response.",
-          sources: result.sources?.map((source: any, idx: number) => ({
+          content: result.data.answer || "I couldn't generate a response.",
+          sources: result.data.sources?.map((source: any, idx: number) => ({
             id: `source-${idx}`,
             filename: source.filename || source.document_name || "Unknown",
             chunk_id: source.chunk_id,
@@ -98,7 +98,7 @@ export default function ChatPage() {
 
         setMessages((prev) => [...prev, assistantMessage]);
       } else {
-        throw new Error(result.error || "Query failed");
+        throw new Error(result.data.error || "Query failed");
       }
     } catch (error) {
       // Error message
