@@ -18,38 +18,44 @@ async def get_graph_data(
 
     Returns nodes and edges in Cytoscape.js format.
     """
-    # TODO: Extract graph data from LightRAG
+    from app.services.rag_service import rag_service
 
-    # Placeholder response
-    return JSONResponse(
-        content={
-            "nodes": [
-                {
-                    "data": {
-                        "id": "entity_1",
-                        "label": "Sample Entity",
-                        "type": "text",
-                        "description": "Sample description",
-                    }
-                }
-            ],
-            "edges": [
-                {
-                    "data": {
-                        "id": "edge_1",
-                        "source": "entity_1",
-                        "target": "entity_2",
-                        "label": "relates_to",
-                    }
-                }
-            ],
-            "metadata": {
-                "total_nodes": 1,
-                "total_edges": 1,
-                "filtered": False,
+    try:
+        # Get graph data from RAG service
+        graph_data = rag_service.get_graph_data(limit=limit)
+
+        if "error" in graph_data:
+            return JSONResponse(
+                status_code=500,
+                content={"error": graph_data["error"]},
+            )
+
+        # Convert to Cytoscape.js format
+        nodes_cytoscape = [
+            {"data": node} for node in graph_data.get("nodes", [])
+        ]
+        edges_cytoscape = [
+            {"data": edge} for edge in graph_data.get("edges", [])
+        ]
+
+        return JSONResponse(
+            content={
+                "nodes": nodes_cytoscape,
+                "edges": edges_cytoscape,
+                "metadata": {
+                    "total_nodes": graph_data.get("node_count", 0),
+                    "total_edges": graph_data.get("edge_count", 0),
+                    "filtered": False,
+                    "message": graph_data.get("message", ""),
+                },
             },
-        },
-    )
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)},
+        )
 
 
 @router.get("/entity/{entity_id}")
@@ -116,15 +122,54 @@ async def get_graph_statistics():
     """
     Get knowledge graph statistics.
     """
-    # TODO: Calculate graph statistics
+    from app.services.rag_service import rag_service
 
-    return JSONResponse(
-        content={
-            "total_nodes": 0,
-            "total_edges": 0,
-            "node_types": {},
-            "edge_types": {},
-            "avg_connections": 0,
-            "density": 0,
-        },
-    )
+    try:
+        # Get graph data for statistics
+        graph_data = rag_service.get_graph_data()
+
+        if "error" in graph_data:
+            return JSONResponse(
+                status_code=500,
+                content={"error": graph_data["error"]},
+            )
+
+        # Calculate basic statistics
+        nodes = graph_data.get("nodes", [])
+        edges = graph_data.get("edges", [])
+
+        # Count node types
+        node_types = {}
+        for node in nodes:
+            node_type = node.get("type", "unknown")
+            node_types[node_type] = node_types.get(node_type, 0) + 1
+
+        # Count edge types
+        edge_types = {}
+        for edge in edges:
+            edge_label = edge.get("label", "unknown")
+            edge_types[edge_label] = edge_types.get(edge_label, 0) + 1
+
+        # Calculate average connections
+        avg_connections = (len(edges) * 2 / len(nodes)) if nodes else 0
+
+        # Calculate density
+        max_edges = len(nodes) * (len(nodes) - 1) / 2 if len(nodes) > 1 else 1
+        density = len(edges) / max_edges if max_edges > 0 else 0
+
+        return JSONResponse(
+            content={
+                "total_nodes": len(nodes),
+                "total_edges": len(edges),
+                "node_types": node_types,
+                "edge_types": edge_types,
+                "avg_connections": round(avg_connections, 2),
+                "density": round(density, 4),
+            },
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)},
+        )

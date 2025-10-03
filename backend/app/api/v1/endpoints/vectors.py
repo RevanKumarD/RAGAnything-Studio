@@ -78,13 +78,29 @@ async def get_vector_statistics():
     """
     Get vector space statistics.
     """
-    # TODO: Calculate vector statistics
+    from app.services.rag_service import rag_service
 
-    return JSONResponse(
-        content={
-            "total_chunks": 0,
-            "embedding_dim": 3072,
-            "avg_similarity": 0,
-            "cluster_count": 0,
-        },
-    )
+    try:
+        # Get vector statistics from RAG service
+        stats = rag_service.get_vector_stats()
+
+        if "error" in stats:
+            return JSONResponse(
+                status_code=500,
+                content={"error": stats["error"]},
+            )
+
+        return JSONResponse(
+            content={
+                "total_chunks": stats.get("total_chunks", 0),
+                "total_entities": stats.get("total_entities", 0),
+                "total_relationships": stats.get("total_relationships", 0),
+                "embedding_dim": stats.get("embedding_dim", 3072),
+            },
+        )
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": str(e)},
+        )

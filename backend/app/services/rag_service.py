@@ -296,9 +296,12 @@ class RAGService:
                 "message": f"Multimodal query failed: {str(e)}",
             }
 
-    def get_graph_data(self) -> Dict[str, Any]:
+    def get_graph_data(self, limit: int = 1000) -> Dict[str, Any]:
         """
-        Get knowledge graph data.
+        Get knowledge graph data from LightRAG.
+
+        Args:
+            limit: Maximum number of nodes/edges to return
 
         Returns:
             Dict with nodes and edges
@@ -308,13 +311,50 @@ class RAGService:
             if not self.rag.lightrag:
                 return {"nodes": [], "edges": [], "error": "Knowledge graph not initialized"}
 
-            # TODO: Extract actual graph data from LightRAG
-            # This is a placeholder - actual implementation depends on LightRAG's graph structure
+            lightrag = self.rag.lightrag
+            nodes = []
+            edges = []
+
+            # Extract entities as nodes from entity vector database
+            if hasattr(lightrag, 'entity_vdb') and lightrag.entity_vdb:
+                try:
+                    # Get entity data - method depends on vector DB implementation
+                    entity_count = 0
+                    # Try to access stored entities
+                    if hasattr(lightrag.entity_vdb, 'entities'):
+                        for entity_id, entity_info in list(lightrag.entity_vdb.entities.items())[:limit]:
+                            nodes.append({
+                                "id": str(entity_id),
+                                "label": str(entity_info.get('name', entity_id)),
+                                "type": entity_info.get('type', 'entity'),
+                                "description": entity_info.get('description', ''),
+                            })
+                            entity_count += 1
+                except Exception as e:
+                    print(f"Could not extract entities: {e}")
+
+            # Extract relationships as edges from graph storage
+            if hasattr(lightrag, 'graph_storage') and lightrag.graph_storage:
+                try:
+                    # Get relationship data
+                    if hasattr(lightrag.graph_storage, 'edges'):
+                        for edge_id, edge_info in list(lightrag.graph_storage.edges.items())[:limit]:
+                            edges.append({
+                                "id": str(edge_id),
+                                "source": str(edge_info.get('source', '')),
+                                "target": str(edge_info.get('target', '')),
+                                "label": edge_info.get('relation', ''),
+                                "weight": edge_info.get('weight', 1.0),
+                            })
+                except Exception as e:
+                    print(f"Could not extract relationships: {e}")
 
             return {
-                "nodes": [],
-                "edges": [],
-                "message": "Graph data extraction to be implemented",
+                "nodes": nodes,
+                "edges": edges,
+                "node_count": len(nodes),
+                "edge_count": len(edges),
+                "message": f"Extracted {len(nodes)} nodes and {len(edges)} edges",
             }
 
         except Exception as e:
@@ -326,18 +366,54 @@ class RAGService:
 
     def get_vector_stats(self) -> Dict[str, Any]:
         """
-        Get vector space statistics.
+        Get vector space statistics from LightRAG.
 
         Returns:
             Dict with vector statistics
         """
         try:
-            # TODO: Extract vector statistics from LightRAG
-            return {
-                "total_chunks": 0,
+            if not self.rag.lightrag:
+                return {"error": "Knowledge graph not initialized"}
+
+            lightrag = self.rag.lightrag
+            stats = {
                 "embedding_dim": 3072,
-                "message": "Vector stats extraction to be implemented",
+                "total_chunks": 0,
+                "total_entities": 0,
+                "total_relationships": 0,
             }
+
+            # Count chunks in chunk vector database
+            if hasattr(lightrag, 'chunk_vdb') and lightrag.chunk_vdb:
+                try:
+                    if hasattr(lightrag.chunk_vdb, 'chunks'):
+                        stats["total_chunks"] = len(lightrag.chunk_vdb.chunks)
+                    elif hasattr(lightrag.chunk_vdb, '__len__'):
+                        stats["total_chunks"] = len(lightrag.chunk_vdb)
+                except Exception as e:
+                    print(f"Could not count chunks: {e}")
+
+            # Count entities in entity vector database
+            if hasattr(lightrag, 'entity_vdb') and lightrag.entity_vdb:
+                try:
+                    if hasattr(lightrag.entity_vdb, 'entities'):
+                        stats["total_entities"] = len(lightrag.entity_vdb.entities)
+                    elif hasattr(lightrag.entity_vdb, '__len__'):
+                        stats["total_entities"] = len(lightrag.entity_vdb)
+                except Exception as e:
+                    print(f"Could not count entities: {e}")
+
+            # Count relationships in graph storage
+            if hasattr(lightrag, 'graph_storage') and lightrag.graph_storage:
+                try:
+                    if hasattr(lightrag.graph_storage, 'edges'):
+                        stats["total_relationships"] = len(lightrag.graph_storage.edges)
+                    elif hasattr(lightrag.graph_storage, '__len__'):
+                        stats["total_relationships"] = len(lightrag.graph_storage)
+                except Exception as e:
+                    print(f"Could not count relationships: {e}")
+
+            return stats
 
         except Exception as e:
             return {
