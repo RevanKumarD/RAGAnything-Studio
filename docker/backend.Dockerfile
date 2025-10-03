@@ -6,20 +6,27 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY backend/requirements.txt .
+# Copy requirements and setup files
+COPY requirements.txt .
+COPY setup.py .
+COPY pyproject.toml .
+COPY MANIFEST.in .
 
-# Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy application
-COPY backend/app ./app
+# Copy raganything package
 COPY raganything ./raganything
 
-# Install raganything in editable mode
-RUN pip install -e .
+# Install Python dependencies and raganything package
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install -e .
+
+# Copy backend application
+COPY backend/app ./app
+
+# Create necessary directories
+RUN mkdir -p /app/rag_storage /app/output /app/inputs
 
 EXPOSE 8000
 
