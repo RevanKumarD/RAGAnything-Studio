@@ -25,7 +25,7 @@ passlib[bcrypt]==1.7.4
 python-dotenv==1.0.0
 aiofiles==23.2.1
 httpx==0.25.2
-python-slugify==8.0.1
+python-slugify==8.0.4
 
 # RAG-Anything Integration
 # Assumes raganything is installed from parent directory
